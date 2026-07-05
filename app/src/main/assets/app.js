@@ -66213,12 +66213,12 @@ var MainController = function () {
 				};
 				var t = {};
 				t.uid = uid.toUpperCase();
-				t.character = !buf.readUInt32LE(pagei(0x26));
+				t.character = !this.api.readTag(0x26).readUInt32LE(0);
 				if (t.character) {
 					var cc = new ld.CharCrypto();
-					t.id = cc.decrypt(t.uid, page(0x24, 2));
+					t.id = cc.decrypt(t.uid, this.api.readTag(0x24).slice(0, 8));
 				} else {
-					t.id = page(0x24).readUInt32LE(0);
+					t.id = this.api.readTag(0x24).readUInt32LE(0);
 				}
 				console.log(t);
 				this.token = t;
