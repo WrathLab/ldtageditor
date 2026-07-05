@@ -66217,7 +66217,7 @@ var MainController = function () {
 				}
 				console.log(t);
 				this.token = t;
-				try { var _nm = (t.character ? this.charmap : this.tokenmap).filter(function(x){return x.id == t.id;}); var _o2 = document.getElementById('rawdump'); if (_o2) _o2.textContent = 'DETECTED: ' + (_nm[0] ? _nm[0].name : ('unknown id ' + t.id)) + (t.character ? '  [character]' : '  [vehicle]') + '\n' + _o2.textContent; } catch (_e) {}
+				try { var _all = this.charmap.concat(this.tokenmap); var _hit = _all.filter(function(x){return x.id == t.id;})[0]; var _o2 = document.getElementById('rawdump'); if (_o2) _o2.textContent = 'DETECTED  id=' + t.id + '  ' + (t.character ? '[char]' : '[veh]') + '  ' + (_hit ? _hit.name + ' (' + _hit.world + ')' : 'NOT IN DB') + '\n' + _o2.textContent; } catch (_e) { var _o3 = document.getElementById('rawdump'); if (_o3) _o3.textContent = 'DECODE ERR: ' + _e.message + '\n' + _o3.textContent; }
 			}
 			if (this.dialog == 'write') {
 				var cc = new ld.CharCrypto();
