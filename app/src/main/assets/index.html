@@ -39,6 +39,7 @@
       <div>
         <button class="btn btn-lg btn-primary" ng-click="main.readToken(main.token)" style="float: left;" ng-style="main.token.uid && {'width':'49%'} || {'width': '100%'}">Read</button>
          <button class="btn btn-lg btn-success" ng-click="main.writeToken(main.token)" style="float: left; width: 49%; margin-left: 2%;" ng-if="main.token.uid">Write</button>
+         <button class="btn btn-lg btn-danger" ng-click="main.clearToken()" style="float: left; width: 100%; margin-top: 8px;" ng-if="main.token.uid">Clear Tag</button>
       </div>
       </div>
 		</div>
