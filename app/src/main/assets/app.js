@@ -66188,6 +66188,11 @@ var MainController = function () {
 			this.dialog = 'write';
 		}
 	}, {
+		key: 'clearToken',
+		value: function clearToken() {
+			this.dialog = 'clear';
+		}
+	}, {
 		key: 'tagDetected',
 		value: function tagDetected() {
 			if (this.dialog == 'read') {
@@ -66246,6 +66251,10 @@ var MainController = function () {
 				if (this.tagType == 'ntag215') this.api.writeTag(0x85, ld.PWDGen(uid));
 				if (this.tagType == 'ntag216') this.api.writeTag(0xE5, ld.PWDGen(uid));
         this.dialog = null;
+			}
+			if (this.dialog == 'clear') {
+				for (var _c = 0x04; _c <= 0x27; _c++) this.api.writeTag(_c, '00000000');
+				var _oc = document.getElementById('rawdump'); if (_oc) _oc.textContent = 'TAG CLEARED';
 			}
 			this.dialog = null;
 		}
