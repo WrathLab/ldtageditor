@@ -64624,7 +64624,7 @@ var CharCrypto = function () {
 			buf.writeUInt32LE(charid, 0);
 			buf.writeUInt32LE(charid, 4);
 			var ret = tea.encrypt(buf);
-			return process.browser ? ret.toString('hex') : ret;
+			return ret.toString('hex');
 		}
 	}, {
 		key: 'decrypt',
