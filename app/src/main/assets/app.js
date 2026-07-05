@@ -66194,7 +66194,8 @@ var MainController = function () {
 				var _d = '';
 				for (var _q = 0x00; _q <= 0x24; _q += 4) { var _b = this.api.readTag(_q); _d += ('0' + _q.toString(16)).slice(-2) + ': ' + (_b ? _b.toString('hex') : 'READ-FAIL') + '\n'; }
 				console.log('TAG DUMP\n' + _d);
-				var _o = document.getElementById('rawdump') || (function(){var e=document.createElement('pre');e.id='rawdump';e.setAttribute('style','position:fixed;top:0;left:0;right:0;max-height:45%;overflow:auto;margin:0;padding:6px;background:#000;color:#0f0;font:11px monospace;z-index:99999;white-space:pre-wrap');document.body.appendChild(e);return e;})();
+				var _o = document.getElementById('rawdump') || (function(){var e=document.createElement('pre');e.id='rawdump';e.setAttribute('style','position:fixed;bottom:0;left:0;right:0;max-height:28%;overflow:auto;margin:0;padding:4px 6px;background:rgba(0,0,0,0.82);color:#0f0;font:10px monospace;z-index:99999;white-space:pre-wrap');e.onclick=function(){e.style.display='none';};document.body.appendChild(e);return e;})();
+				_o.style.display='block';
 				_o.textContent = _d;
 				var uid = this.api.readTag(0x00).toString('hex').replace(/^(.{6})..(.{8}).*$/, '$1$2');
 				var buf = this.api.readTag(0x23);
@@ -66216,6 +66217,7 @@ var MainController = function () {
 				}
 				console.log(t);
 				this.token = t;
+				try { var _nm = (t.character ? this.charmap : this.tokenmap).filter(function(x){return x.id == t.id;}); var _o2 = document.getElementById('rawdump'); if (_o2) _o2.textContent = 'DETECTED: ' + (_nm[0] ? _nm[0].name : ('unknown id ' + t.id)) + (t.character ? '  [character]' : '  [vehicle]') + '\n' + _o2.textContent; } catch (_e) {}
 			}
 			if (this.dialog == 'write') {
 				var cc = new ld.CharCrypto();
