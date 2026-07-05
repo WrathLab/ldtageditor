@@ -39,6 +39,8 @@ No PC required - GitHub builds the APK for you:
 
 To build locally instead: open the project in Android Studio (JDK 11), `Build > Build APK(s)`.
 
+Prebuilt APK: grab the latest from the [Releases](../../releases/latest) page. It's debug-signed for sideloading, so on install Android will warn about an unknown source / Play Protect - that's expected for an app distributed this way; tap through to install.
+
 ## Troubleshooting
 
 - **No Write button** - you must Read a tag first; Write only appears once a UID is loaded.
