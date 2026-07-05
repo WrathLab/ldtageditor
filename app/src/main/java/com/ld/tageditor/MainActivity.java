@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private String[][] mTechLists;
     NfcAdapter nfc;
     public Tag tag;
+    public NfcA nfcA;   // shared connection reused across a page batch
     WebView webView;
 
     /* Access modifiers changed, original: protected */
@@ -104,6 +105,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        // New tap = new RF session. Drop any stale connection from the previous tap.
+        if (this.nfcA != null) {
+            try {
+                this.nfcA.close();
+            } catch (Exception ignored) {
+            }
+            this.nfcA = null;
+        }
         this.tag = (Tag) intent.getParcelableExtra("android.nfc.extra.TAG");
         Log.i("Foreground dispatch", "Discovered tag");
         callJavaScript("AndroidApp.tagDetected", new Object[0]);
