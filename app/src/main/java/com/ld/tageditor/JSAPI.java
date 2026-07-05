@@ -1,6 +1,5 @@
 package com.ld.tageditor;
 
-import android.nfc.tech.MifareUltralight;
 import android.nfc.tech.NfcA;
 import android.util.Base64;
 import android.util.Log;
@@ -17,94 +16,67 @@ public class JSAPI {
         this.web = paramWeb;
     }
 
+    // Reuse one open connection for the whole tap. Opened lazily, closed on
+    // failure or when MainActivity.onNewIntent sees the next tap.
+    private NfcA connect() throws IOException {
+        NfcA nfcA = this.activity.nfcA;
+        if (nfcA == null) {
+            nfcA = NfcA.get(this.activity.tag);
+            this.activity.nfcA = nfcA;
+        }
+        if (!nfcA.isConnected()) {
+            nfcA.connect();
+            nfcA.setTimeout(250);
+        }
+        return nfcA;
+    }
+
+    private void closeConn() {
+        if (this.activity.nfcA != null) {
+            try {
+                this.activity.nfcA.close();
+            } catch (IOException ignored) {
+            }
+            this.activity.nfcA = null;
+        }
+    }
+
     @JavascriptInterface
     public String readTag(byte page) {
-//        MifareUltralight mifare = MifareUltralight.get(this.activity.tag);
-        NfcA nfcA = NfcA.get(this.activity.tag);
         try {
-            Log.i("JSAPI", "Connecting");
-            nfcA.connect();
-//            mifare.connect();
-            Log.i("JSAPI", "Connected");
-            Log.i("JSAPI", "Read");
-
+            NfcA nfcA = connect();
             byte[] message = new byte[] {
                     0x30,
-                    (byte)(page & 0xFF)
+                    (byte) (page & 0xFF)
             };
-
-//            byte[] payload = mifare.readPages(page);
             byte[] payload = nfcA.transceive(message);
-//            Log.i("JSAPI", String.format("Payload %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X %02X%02X%02X%02X", new Object[]{Byte.valueOf(payload[0]), Byte.valueOf(payload[1]), Byte.valueOf(payload[2]), Byte.valueOf(payload[3]), Byte.valueOf(payload[4]), Byte.valueOf(payload[5]), Byte.valueOf(payload[6]), Byte.valueOf(payload[7]), Byte.valueOf(payload[8]), Byte.valueOf(payload[9]), Byte.valueOf(payload[10]), Byte.valueOf(payload[11]), Byte.valueOf(payload[12]), Byte.valueOf(payload[13]), Byte.valueOf(payload[14]), Byte.valueOf(mifare.readPages(page)[15])}));
             String encodeToString = Base64.encodeToString(payload, 0, 16, 0);
-            Log.i("JSAPI", encodeToString);
+            Log.i("JSAPI", "read p" + (page & 0xFF) + " -> " + encodeToString);
             return encodeToString;
         } catch (IOException e) {
-            Log.e("JSAPI", "IOException while writing MifareUltralight message...", e);
-            Log.e("JSAPI", e.getMessage());
-            if (nfcA != null) {
-                return null;
-            }
-        } finally {
-            if (nfcA!= null) {
-                try {
-                    nfcA.close();
-                } catch (IOException e22) {
-                    Log.e("JSAPI", "Error closing tag...", e22);
-                }
-            }
+            Log.e("JSAPI", "read failed p" + (page & 0xFF), e);
+            closeConn();
+            return null;
         }
-        return null;
     }
 
     @JavascriptInterface
     public boolean writeTag(byte page, String payload) {
         byte[] data = Base64.decode(payload, 0);
-        NfcA nfca = NfcA.get(this.activity.tag);
-//        MifareUltralight ultralight = MifareUltralight.get(this.activity.tag);
         try {
-            Log.i("JSAPI", "Connecting");
-            nfca.connect();
-//            ultralight.connect();
-            Log.i("JSAPI", "Connected");
-            Log.i("JSAPI", String.format("Writing %02X%02X%02X%02X", new Object[]{Byte.valueOf(data[0]), Byte.valueOf(data[1]), Byte.valueOf(data[2]), Byte.valueOf(data[3])}));
+            NfcA nfcA = connect();
             byte[] message = new byte[] {
                     (byte) 0xA2,
-                    (byte)(page & 0xFF),
+                    (byte) (page & 0xFF),
                     data[0], data[1], data[2], data[3]
             };
-            byte[] result = nfca.transceive(message);
-            Log.i("JSAPI", "Writing Done");
-            try {
-                Log.i("JSAPI", "Closing");
-                nfca.close();
-                Log.i("JSAPI", "Closed");
-                return true;
-            } catch (IOException e) {
-                Log.e("JSAPI", "IOException while closing MifareUltralight...", e);
-                return false;
-            }
-        } catch (IOException e2) {
-            Log.e("JSAPI", "IOException while closing MifareUltralight...", e2);
-            try {
-                Log.i("JSAPI", "Closing");
-                nfca.close();
-                Log.i("JSAPI", "Closed");
-                return true;
-            } catch (IOException e22) {
-                Log.e("JSAPI", "IOException while closing MifareUltralight...", e22);
-                return false;
-            }
-        } catch (Throwable th) {
-            try {
-                Log.i("JSAPI", "Closing");
-                nfca.close();
-                Log.i("JSAPI", "Closed");
-                return true;
-            } catch (IOException e222) {
-                Log.e("JSAPI", "IOException while closing MifareUltralight...", e222);
-                return false;
-            }
+            nfcA.transceive(message);
+            Log.i("JSAPI", "wrote p" + (page & 0xFF));
+            return true;
+        } catch (IOException e) {
+            Log.e("JSAPI", "write failed p" + (page & 0xFF), e);
+            closeConn();
+            return false;
         }
     }
 
