@@ -66191,6 +66191,11 @@ var MainController = function () {
 		key: 'tagDetected',
 		value: function tagDetected() {
 			if (this.dialog == 'read') {
+				var _d = '';
+				for (var _q = 0x00; _q <= 0x24; _q += 4) { var _b = this.api.readTag(_q); _d += ('0' + _q.toString(16)).slice(-2) + ': ' + (_b ? _b.toString('hex') : 'READ-FAIL') + '\n'; }
+				console.log('TAG DUMP\n' + _d);
+				var _o = document.getElementById('rawdump') || (function(){var e=document.createElement('pre');e.id='rawdump';e.setAttribute('style','position:fixed;top:0;left:0;right:0;max-height:45%;overflow:auto;margin:0;padding:6px;background:#000;color:#0f0;font:11px monospace;z-index:99999;white-space:pre-wrap');document.body.appendChild(e);return e;})();
+				_o.textContent = _d;
 				var uid = this.api.readTag(0x00).toString('hex').replace(/^(.{6})..(.{8}).*$/, '$1$2');
 				var buf = this.api.readTag(0x23);
 				console.log('reading', uid, buf);
@@ -66216,6 +66221,7 @@ var MainController = function () {
 				var cc = new ld.CharCrypto();
 				var uid = this.api.readTag(0x00).toString('hex').replace(/^(.{6})..(.{8}).*$/, '$1$2');
 				var t = this.token;
+				for (var _p = 0x04; _p <= 0x27; _p++) this.api.writeTag(_p, '00000000');
 				if (t.character) {
 					var enc = cc.encrypt(uid, t.id);
 					this.api.writeTag(0x24, enc.slice(0, 8));
