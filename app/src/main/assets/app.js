@@ -66223,6 +66223,8 @@ var MainController = function () {
 				var cc = new ld.CharCrypto();
 				var uid = this.api.readTag(0x00).toString('hex').replace(/^(.{6})..(.{8}).*$/, '$1$2');
 				var t = this.token;
+				var _valid = this.charmap.concat(this.tokenmap).some(function(x){return x.id == t.id;});
+				if (!_valid) { var _w = document.getElementById('rawdump') || document.body.appendChild(Object.assign(document.createElement('pre'), { id: 'rawdump' })); _w.style.cssText = 'position:fixed;bottom:0;left:0;right:0;padding:6px;background:#a00;color:#fff;font:12px monospace;z-index:99999'; _w.textContent = 'PICK A VALID ID FROM DROPDOWN \u2014 current id ' + t.id + ' not in DB'; this.dialog = null; return; }
 				for (var _p = 0x04; _p <= 0x27; _p++) this.api.writeTag(_p, '00000000');
 				if (t.character) {
 					var enc = cc.encrypt(uid, t.id);
